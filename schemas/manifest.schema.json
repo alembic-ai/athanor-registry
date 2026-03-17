@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/alembic-ai/athanor-registry/main/schemas/manifest.schema.json",
+  "title": "Athanor Entry Manifest",
+  "description": "Schema for individual entry manifest.json files in entries/<id>/",
+  "type": "object",
+  "required": [
+    "id", "name", "type", "author", "repo", "version",
+    "min_athanor_version", "description", "license"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9\\-_]*$",
+      "maxLength": 40
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80
+    },
+    "type": {
+      "type": "string",
+      "enum": ["module", "skill", "skill-bundle", "stack-blueprint"]
+    },
+    "author": {
+      "type": "string",
+      "minLength": 1
+    },
+    "repo": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://github\\.com/"
+    },
+    "release_zip_url": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+"
+    },
+    "min_athanor_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 300
+    },
+    "license": {
+      "type": "string",
+      "minLength": 1
+    },
+    "icon_emoji": {
+      "type": ["string", "null"]
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "capabilities": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "interaction_type": {
+      "type": "string",
+      "enum": ["interactive", "output", "observe", "background"]
+    },
+    "use_case_tags": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["developer", "researcher", "trader", "creative", "operations", "general"]
+      }
+    },
+    "swarm_size_tags": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["solo", "small", "large", "all"]
+      }
+    },
+    "screenshots": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Relative paths to screenshots in the entry directory"
+    },
+    "homepage": {
+      "type": "string",
+      "format": "uri"
+    },
+    "keywords": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "changelog": {
+      "type": "string",
+      "description": "Markdown changelog for this version"
+    }
+  }
+}

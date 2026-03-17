@@ -1,0 +1,152 @@
+name: Validate Submission
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'registry.json'
+      - 'entries/**'
+
+jobs:
+  validate:
+    name: Validate Registry Entry
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install ajv-cli
+        run: npm install -g ajv-cli ajv-formats
+
+      - name: Validate registry.json schema
+        run: |
+          ajv validate \
+            -s schemas/registry.schema.json \
+            -d registry.json \
+            --spec=draft2020 \
+            -c ajv-formats
+
+      - name: Check for duplicate IDs
+        run: |
+          DUPES=$(jq -r '.entries[].id' registry.json | sort | uniq -d)
+          if [ -n "$DUPES" ]; then
+            echo "::error::Duplicate entry IDs found: $DUPES"
+            exit 1
+          fi
+          echo "No duplicate IDs found."
+
+      - name: Validate entry directories match registry
+        run: |
+          ERRORS=0
+          for id in $(jq -r '.entries[] | select(.bundled == false) | .id' registry.json); do
+            if [ ! -d "entries/$id" ]; then
+              echo "::error::Missing entry directory: entries/$id"
+              ERRORS=$((ERRORS + 1))
+            fi
+            if [ ! -f "entries/$id/manifest.json" ]; then
+              echo "::error::Missing manifest: entries/$id/manifest.json"
+              ERRORS=$((ERRORS + 1))
+            fi
+            if [ ! -f "entries/$id/README.md" ]; then
+              echo "::error::Missing README: entries/$id/README.md"
+              ERRORS=$((ERRORS + 1))
+            fi
+          done
+          if [ $ERRORS -gt 0 ]; then
+            echo "::error::$ERRORS validation errors found"
+            exit 1
+          fi
+          echo "All entry directories valid."
+
+      - name: Validate entry manifests
+        run: |
+          for manifest in entries/*/manifest.json; do
+            if [ -f "$manifest" ]; then
+              echo "Validating $manifest..."
+              ajv validate \
+                -s schemas/manifest.schema.json \
+                -d "$manifest" \
+                --spec=draft2020 \
+                -c ajv-formats
+            fi
+          done
+
+      - name: Check entry ID consistency
+        run: |
+          ERRORS=0
+          for dir in entries/*/; do
+            if [ -f "$dir/manifest.json" ]; then
+              DIR_ID=$(basename "$dir")
+              MANIFEST_ID=$(jq -r '.id' "$dir/manifest.json")
+              if [ "$DIR_ID" != "$MANIFEST_ID" ]; then
+                echo "::error::ID mismatch: directory '$DIR_ID' vs manifest '$MANIFEST_ID'"
+                ERRORS=$((ERRORS + 1))
+              fi
+            fi
+          done
+          if [ $ERRORS -gt 0 ]; then
+            exit 1
+          fi
+          echo "All IDs consistent."
+
+      - name: Verify no dangerous files in submissions
+        run: |
+          DANGEROUS=$(find entries/ -type f \( \
+            -name "*.env" -o -name "*.pem" -o -name "*.key" \
+            -o -name "*secret*" -o -name "*token*" \
+            -o -name "*.p12" -o -name "*.pfx" \
+          \) 2>/dev/null || true)
+          if [ -n "$DANGEROUS" ]; then
+            echo "::error::Dangerous files detected: $DANGEROUS"
+            exit 1
+          fi
+          echo "No dangerous files found."
+
+      - name: Check repo URLs are reachable
+        run: |
+          ERRORS=0
+          for entry in $(jq -c '.entries[] | select(.bundled == false)' registry.json); do
+            REPO=$(echo "$entry" | jq -r '.repo')
+            ID=$(echo "$entry" | jq -r '.id')
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$REPO" || echo "000")
+            if [ "$STATUS" != "200" ]; then
+              echo "::warning::Repository for '$ID' returned HTTP $STATUS: $REPO"
+              ERRORS=$((ERRORS + 1))
+            fi
+          done
+          if [ $ERRORS -gt 0 ]; then
+            echo "::warning::$ERRORS unreachable repositories (non-blocking)"
+          fi
+          echo "Repo check complete."
+
+      - name: Validate semver versions
+        run: |
+          ERRORS=0
+          for entry in $(jq -c '.entries[]' registry.json); do
+            ID=$(echo "$entry" | jq -r '.id')
+            VERSION=$(echo "$entry" | jq -r '.version')
+            if ! echo "$VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+'; then
+              echo "::error::Invalid semver for '$ID': $VERSION"
+              ERRORS=$((ERRORS + 1))
+            fi
+          done
+          if [ $ERRORS -gt 0 ]; then
+            exit 1
+          fi
+          echo "All versions valid."
+
+      - name: Summary
+        if: always()
+        run: |
+          TOTAL=$(jq '.entries | length' registry.json)
+          VERIFIED=$(jq '[.entries[] | select(.verified == true)] | length' registry.json)
+          COMMUNITY=$(jq '[.entries[] | select(.bundled == false)] | length' registry.json)
+          echo "## Registry Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- **Total entries:** $TOTAL" >> $GITHUB_STEP_SUMMARY
+          echo "- **Verified:** $VERIFIED" >> $GITHUB_STEP_SUMMARY
+          echo "- **Community:** $COMMUNITY" >> $GITHUB_STEP_SUMMARY

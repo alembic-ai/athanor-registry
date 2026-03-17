@@ -1,0 +1,112 @@
+name: Module / Skill Submission
+description: Submit a new module, skill, or stack blueprint to the Athanor Registry
+title: "[Submission] "
+labels: ["submission", "needs-review"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for contributing to the Athanor ecosystem! Please fill out the details below.
+        For the full submission guide, see [CONTRIBUTING.md](../CONTRIBUTING.md).
+
+  - type: input
+    id: entry-id
+    attributes:
+      label: Entry ID
+      description: "Lowercase kebab-case, max 40 chars (e.g., `my-cool-module`)"
+      placeholder: "my-module"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: entry-type
+    attributes:
+      label: Entry Type
+      options:
+        - module
+        - skill
+        - skill-bundle
+        - stack-blueprint
+    validations:
+      required: true
+
+  - type: input
+    id: repo-url
+    attributes:
+      label: Repository URL
+      description: "Public GitHub repository containing your entry"
+      placeholder: "https://github.com/username/my-module"
+    validations:
+      required: true
+
+  - type: input
+    id: release-url
+    attributes:
+      label: Release Zip URL
+      description: "Direct link to the zip asset on your GitHub Release"
+      placeholder: "https://github.com/username/my-module/releases/download/v1.0.0/my-module-v1.0.0.zip"
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: "Semver version (e.g., 1.0.0)"
+      placeholder: "1.0.0"
+    validations:
+      required: true
+
+  - type: input
+    id: license
+    attributes:
+      label: License
+      description: "SPDX identifier (e.g., MIT, Apache-2.0, CC-BY-4.0)"
+      placeholder: "MIT"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: "What does your entry do? (max 300 characters)"
+      placeholder: "A brief description of your module or skill..."
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      options:
+        - label: "My repository is public"
+          required: true
+        - label: "I have a valid `module.json` manifest"
+          required: true
+        - label: "I have created a GitHub Release with a zip asset"
+          required: true
+        - label: "The zip extracts to a single directory matching my entry ID"
+          required: true
+        - label: "No secrets, keys, or sensitive files are included"
+          required: true
+        - label: "Total extracted size is under 50MB"
+          required: true
+        - label: "I have at least one screenshot"
+          required: true
+        - label: "I own or have rights to distribute this code"
+          required: true
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots
+      description: "Upload or link at least one screenshot"
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: "Anything else the review team should know?"

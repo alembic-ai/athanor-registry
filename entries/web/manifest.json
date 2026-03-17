@@ -1,0 +1,16 @@
+{
+  "id": "web",
+  "name": "Web",
+  "type": "module",
+  "author": "alembic-ai",
+  "repo": "https://github.com/alembic-ai/opn_athnr_beta",
+  "version": "1.0.0",
+  "min_athanor_version": "0.1.0",
+  "description": "Web access — fetch pages, search, bookmark, extract readable content.",
+  "license": "MIT",
+  "tags": ["web", "search", "bookmarks", "scraping"],
+  "capabilities": ["web-fetch", "web-search", "bookmarks", "readable-extract"],
+  "interaction_type": "interactive",
+  "use_case_tags": ["researcher", "developer", "general"],
+  "swarm_size_tags": ["all"]
+}

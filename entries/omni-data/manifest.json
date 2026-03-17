@@ -1,0 +1,16 @@
+{
+  "id": "omni-data",
+  "name": "Omni-Data Market Engine",
+  "type": "module",
+  "author": "alembic-ai",
+  "repo": "https://github.com/alembic-ai/opn_athnr_beta",
+  "version": "1.0.0",
+  "min_athanor_version": "0.1.0",
+  "description": "Plug-and-play sensory data pipeline — real-time market data across TradFi, on-chain, and CEX sources injected into BSS.",
+  "license": "CC-BY-4.0",
+  "tags": ["finance", "trading", "market-data", "on-chain", "derivatives", "defi"],
+  "capabilities": ["exchange-data", "orderflow", "macro-data", "on-chain", "options-greeks", "derivatives", "portfolio-state", "risk-calculations", "chart-broadcast", "replay-engine"],
+  "interaction_type": "observe",
+  "use_case_tags": ["trader"],
+  "swarm_size_tags": ["small", "large"]
+}

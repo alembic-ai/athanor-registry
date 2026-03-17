@@ -1,0 +1,16 @@
+{
+  "id": "comms",
+  "name": "Comms",
+  "type": "module",
+  "author": "alembic-ai",
+  "repo": "https://github.com/alembic-ai/opn_athnr_beta",
+  "version": "1.0.0",
+  "min_athanor_version": "0.1.0",
+  "description": "Unified comms — internal bus, Telegram, Discord, Email, webhooks, conversations.",
+  "license": "MIT",
+  "tags": ["messaging", "telegram", "discord", "email", "webhook"],
+  "capabilities": ["telegram", "discord", "email", "webhook", "message-routing", "internal-bus", "conversations"],
+  "interaction_type": "output",
+  "use_case_tags": ["operations", "developer", "general"],
+  "swarm_size_tags": ["small", "large"]
+}

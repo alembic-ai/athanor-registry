@@ -1,0 +1,104 @@
+name: Update Download Counts
+
+on:
+  schedule:
+    # Run nightly at 03:00 UTC
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-counts:
+    name: Sync Download Counts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Fetch and update download counts
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # This script queries GitHub release download counts for each entry
+          # and updates registry.json accordingly.
+          # For bundled entries (no release_zip_url), counts stay at 0.
+
+          node -e "
+          const fs = require('fs');
+          const { execSync } = require('child_process');
+
+          const registry = JSON.parse(fs.readFileSync('registry.json', 'utf8'));
+          let updated = false;
+
+          for (const entry of registry.entries) {
+            if (entry.bundled || !entry.release_zip_url) continue;
+
+            // Extract owner/repo from repo URL
+            const match = entry.repo.match(/github\\.com\\/([^/]+)\\/([^/]+)/);
+            if (!match) continue;
+
+            const [, owner, repo] = match;
+            try {
+              const result = execSync(
+                \`gh api repos/\${owner}/\${repo}/releases --jq '[.[].assets[].download_count] | add // 0'\`,
+                { encoding: 'utf8', timeout: 10000 }
+              ).trim();
+
+              const count = parseInt(result, 10);
+              if (!isNaN(count) && count !== entry.download_count) {
+                console.log(\`\${entry.id}: \${entry.download_count} -> \${count}\`);
+                entry.download_count = count;
+                updated = true;
+              }
+            } catch (e) {
+              console.warn(\`Failed to fetch counts for \${entry.id}: \${e.message}\`);
+            }
+          }
+
+          if (updated) {
+            registry.generatedAt = new Date().toISOString();
+            fs.writeFileSync('registry.json', JSON.stringify(registry, null, 2) + '\\n');
+            console.log('registry.json updated');
+          } else {
+            console.log('No changes needed');
+          }
+          "
+
+      - name: Check for most-used badge thresholds
+        run: |
+          node -e "
+          const fs = require('fs');
+          const registry = JSON.parse(fs.readFileSync('registry.json', 'utf8'));
+          const THRESHOLD = 100; // Downloads needed for most-used badge
+          let updated = false;
+
+          for (const entry of registry.entries) {
+            if (entry.download_count >= THRESHOLD && !entry.badges.includes('most-used')) {
+              entry.badges.push('most-used');
+              console.log(\`Awarded most-used badge to \${entry.id} (\${entry.download_count} downloads)\`);
+              updated = true;
+            }
+          }
+
+          if (updated) {
+            fs.writeFileSync('registry.json', JSON.stringify(registry, null, 2) + '\\n');
+          }
+          "
+
+      - name: Commit and push if changed
+        run: |
+          git diff --quiet registry.json && exit 0
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add registry.json
+          git commit -m "chore: update download counts [automated]"
+          git push

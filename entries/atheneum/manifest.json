@@ -1,0 +1,16 @@
+{
+  "id": "atheneum",
+  "name": "Atheneum",
+  "type": "module",
+  "author": "alembic-ai",
+  "repo": "https://github.com/alembic-ai/opn_athnr_beta",
+  "version": "1.0.0",
+  "min_athanor_version": "0.1.0",
+  "description": "Digital archive — PDFs, scanned documents, indexed and enriched by models.",
+  "license": "MIT",
+  "tags": ["archive", "documents", "pdf", "search", "ai"],
+  "capabilities": ["pdf-archive", "document-indexing", "ocr", "search", "model-enrichment"],
+  "interaction_type": "interactive",
+  "use_case_tags": ["researcher", "developer", "general"],
+  "swarm_size_tags": ["all"]
+}

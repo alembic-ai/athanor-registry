@@ -1,0 +1,16 @@
+{
+  "id": "gardener",
+  "name": "Gardener",
+  "type": "module",
+  "author": "alembic-ai",
+  "repo": "https://github.com/alembic-ai/opn_athnr_beta",
+  "version": "1.0.0",
+  "min_athanor_version": "0.1.0",
+  "description": "Swarm intelligence daemon — convergence detection, memory evolution, and knowledge management across agents.",
+  "license": "MIT",
+  "tags": ["swarm", "intelligence", "memory", "convergence", "evolution"],
+  "capabilities": ["convergence-detection", "memory-evolution", "knowledge-management", "agent-coordination"],
+  "interaction_type": "observe",
+  "use_case_tags": ["developer", "researcher", "operations"],
+  "swarm_size_tags": ["small", "large"]
+}

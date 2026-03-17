@@ -1,0 +1,190 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/alembic-ai/athanor-registry/main/schemas/registry.schema.json",
+  "title": "Athanor Registry",
+  "description": "Schema for the master registry.json consumed by the Athanor app marketplace",
+  "type": "object",
+  "required": ["version", "generatedAt", "entries"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Registry schema version (semver)"
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of last generation"
+    },
+    "entries": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/entry" },
+      "description": "All registry entries"
+    }
+  },
+  "$defs": {
+    "entry": {
+      "type": "object",
+      "required": [
+        "id", "name", "type", "author", "repo", "version",
+        "min_athanor_version", "verified", "featured", "tags",
+        "description", "download_count", "badges", "author_badges",
+        "license", "interaction_type", "capabilities",
+        "use_case_tags", "swarm_size_tags",
+        "created_at", "updated_at", "bundled", "paywalled"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9\\-_]*$",
+          "maxLength": 40,
+          "description": "Unique lowercase kebab-case identifier"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80,
+          "description": "Human-readable display name"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["module", "skill", "skill-bundle", "stack-blueprint"],
+          "description": "Entry type"
+        },
+        "author": {
+          "type": "string",
+          "minLength": 1,
+          "description": "GitHub username of the creator"
+        },
+        "repo": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://github\\.com/",
+          "description": "GitHub repository URL"
+        },
+        "release_zip_url": {
+          "type": "string",
+          "description": "Direct URL to the GitHub release zip asset (empty for bundled)"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+",
+          "description": "Semver version of this entry"
+        },
+        "min_athanor_version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+",
+          "description": "Minimum compatible Athanor version"
+        },
+        "verified": {
+          "type": "boolean",
+          "description": "Whether the Alembic team has reviewed and approved this entry"
+        },
+        "featured": {
+          "type": "boolean",
+          "description": "Whether this entry is featured in the marketplace"
+        },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Searchable tags"
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 300,
+          "description": "Short description shown in marketplace cards"
+        },
+        "icon_emoji": {
+          "type": ["string", "null"],
+          "description": "Optional emoji used as icon"
+        },
+        "download_count": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total install count"
+        },
+        "badges": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "staff-pick", "beta-pioneer", "contributor",
+              "bug-finder", "community-specialist", "most-used",
+              "verified-creator"
+            ]
+          },
+          "description": "Entry-level badges"
+        },
+        "author_badges": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "beta-pioneer", "contributor", "bug-finder",
+              "community-specialist", "most-used", "verified-creator"
+            ]
+          },
+          "description": "Author-level badges"
+        },
+        "license": {
+          "type": "string",
+          "minLength": 1,
+          "description": "SPDX license identifier"
+        },
+        "interaction_type": {
+          "type": "string",
+          "enum": ["interactive", "output", "observe", "background"],
+          "description": "How users interact with this entry"
+        },
+        "capabilities": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Machine-readable capability tags"
+        },
+        "use_case_tags": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["developer", "researcher", "trader", "creative", "operations", "general"]
+          },
+          "description": "Target user personas"
+        },
+        "swarm_size_tags": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["solo", "small", "large", "all"]
+          },
+          "description": "Recommended swarm sizes"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "bundled": {
+          "type": "boolean",
+          "description": "Whether this entry ships with Athanor"
+        },
+        "bundled_module_id": {
+          "type": "string",
+          "description": "Internal module ID for bundled entries"
+        },
+        "paywalled": {
+          "type": "boolean",
+          "description": "Whether this entry requires payment (future use)"
+        },
+        "payment_url": {
+          "type": "string",
+          "format": "uri",
+          "description": "Payment URL for paywalled entries (future use)"
+        }
+      }
+    }
+  }
+}
