@@ -1,0 +1,57 @@
+{
+  "id": "omni_data",
+  "name": "Omni-Data Market Engine",
+  "version": "1.0.0",
+  "type": "human_layer",
+  "description": "A plug-and-play purely sensory data pipeline for the Alembic AI ecosystem. Injects real-time market data across TradFi, On-chain, and CEX sources directly into BSS and Athanor. Contains ZERO inference, skills, or agent execution layers.",
+  "author": "Alembic AI Studios",
+  "license": "CC-BY-4.0",
+  "icon": "👁",
+  "core": false,
+  "enabled": true,
+  "tab": {
+    "label": "Markets",
+    "component": "omni_data"
+  },
+  "capabilities": [
+    "exchange-data",
+    "orderflow",
+    "macro-data",
+    "on-chain",
+    "options-greeks",
+    "derivatives",
+    "portfolio-state",
+    "risk-calculations",
+    "chart-broadcast",
+    "replay-engine"
+  ],
+  "interaction": "observe",
+  "entrypoint": "omni_data.orchestrator:cli",
+  "dependencies": {
+    "system": [
+      "zeromq",
+      "python>=3.11"
+    ],
+    "python": [
+      "ccxt",
+      "pydantic",
+      "pydantic-settings",
+      "pyzmq",
+      "pandas",
+      "aiohttp",
+      "yfinance"
+    ]
+  },
+  "provides": [
+    "data_stream:zeromq_pub",
+    "bss_native_blinks:active",
+    "bss_handoff_blinks:relay",
+    "bss_base36_artifacts:json"
+  ],
+  "env_vars": [
+    "OMNI_EXCHANGES",
+    "OMNI_SYMBOLS",
+    "OMNI_ENABLE_BSS_TRANSLATOR",
+    "OMNI_BSS_ROOT"
+  ]
+}
