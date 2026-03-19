@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "type": "human_layer",
   "description": "A plug-and-play purely sensory data pipeline for the Alembic AI ecosystem. Injects real-time market data across TradFi, On-chain, and CEX sources directly into BSS and Athanor. Contains ZERO inference, skills, or agent execution layers.",
-  "author": "Alembic AI Studios",
+  "author": "raiden-crypt",
   "license": "CC-BY-4.0",
   "icon": "👁",
   "core": false,
