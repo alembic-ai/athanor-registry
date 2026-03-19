@@ -2,7 +2,7 @@
   "id": "omni-data",
   "name": "Omni-Data Market Engine",
   "type": "module",
-  "author": "alembic-ai",
+  "author": "raiden-crypt",
   "repo": "https://github.com/alembic-ai/opn_athnr_beta",
   "version": "1.0.0",
   "min_athanor_version": "0.1.0",
